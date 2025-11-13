@@ -1,45 +1,50 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../widgets/custom_button.dart';
 
-// ResetPasswordScreen (compact)
 class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({Key? key}) : super(key: key);
+
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
+
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _email = TextEditingController();
-  bool _loading = false;
-  final _auth = FirebaseAuth.instance;
+  final _emailCtl = TextEditingController();
 
-  @override void dispose() { _email.dispose(); super.dispose(); }
+  @override
+  void dispose() {
+    _emailCtl.dispose();
+    super.dispose();
+  }
 
-  Future<void> _send() async {
-    final email = _email.text.trim();
+  Future<void> _sendReset() async {
+    final email = _emailCtl.text.trim();
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter your email')));
       return;
     }
-    setState(() => _loading = true);
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reset email sent')));
-      Navigator.pop(context);
+      Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Error')));
-    } finally { if (mounted) setState(() => _loading = false); }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Error sending reset')));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
-  Widget build(BuildContext c) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Reset Password')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(children: [
-          TextField(controller: _email, decoration: const InputDecoration(labelText: 'Email')),
-          const SizedBox(height: 12),
-          ElevatedButton(onPressed: _loading ? null : _send,
-              child: _loading ? const CircularProgressIndicator() : const Text('Send Reset Email')),
+          TextField(controller: _emailCtl, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email')),
+          const SizedBox(height: 16),
+          CustomButton(label: 'Send Reset Email', onPressedAsync: _sendReset),
         ]),
       ),
     );
