@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "648777948964",
+    "project_id": "mp-project-lab",
+    "storage_bucket": "mp-project-lab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:648777948964:android:5f2cfddea11f6c92fa5db1",
+        "android_client_info": {
+          "package_name": "com.example.mp_lab_firebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtE-h0qgiaXbh5r5abu-48k-BAXAGamJ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
