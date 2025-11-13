@@ -4,8 +4,6 @@ import '../widgets/custom_button.dart';
 import 'sign_up_screen.dart';
 import 'reset_password_screen.dart';
 
-final _auth = FirebaseAuth.instance;
-
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
 
