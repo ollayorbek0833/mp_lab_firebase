@@ -36,16 +36,6 @@ class _SignInScreenState extends State<SignInScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      final cred = await _auth.signInWithEmailAndPassword(
-        email: _emailCtl.text.trim(),
-        password: _passCtl.text,
-      );
-      final user = cred.user;
-      if (user != null && !user.emailVerified) {
-        // show verification prompt
-        await _auth.signOut();
-        _showVerifyDialog();
-      }
       // If verified, AuthGate will pick up authState and navigate to Home.
     } on FirebaseAuthException catch (e) {
       var msg = e.message ?? 'Sign-in failed';
@@ -57,41 +47,6 @@ class _SignInScreenState extends State<SignInScreen> {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
     }
-  }
-
-  void _showVerifyDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Email not verified'),
-          content: const Text('Please verify your email first. Check your inbox.'),
-          actions: [
-            TextButton(
-              onPressed: () async {
-                final email = _emailCtl.text.trim();
-                try {
-                  // find user by signing in with email & password quickly: or send verification from admin console.
-                  // Simpler UX: send verification mail by creating a new temp sign-in and sending verification there
-                  final tempCred = await _auth.signInWithEmailAndPassword(
-                    email: email,
-                    password: _passCtl.text,
-                  );
-                  await tempCred.user?.sendEmailVerification();
-                  await _auth.signOut();
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verification email resent')));
-                } on FirebaseAuthException catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? 'Could not resend')));
-                }
-              },
-              child: const Text('Resend verification'),
-            ),
-            TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
-          ],
-        );
-      },
-    );
   }
 
   @override
