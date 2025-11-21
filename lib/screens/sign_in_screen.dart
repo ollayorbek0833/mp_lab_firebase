@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_button.dart';
+import 'home_screen.dart';
 import 'sign_up_screen.dart';
 import 'reset_password_screen.dart';
 
@@ -30,20 +31,43 @@ class _SignInScreenState extends State<SignInScreen> {
     return null;
   }
 
+  final _auth = FirebaseAuth.instance;
+
   Future<void> _signInAsync() async {
     if (!_formKey.currentState!.validate()) return;
 
+    // Optional: show a loading state (setState / button disabled) if you have state management
     try {
-      // If verified, AuthGate will pick up authState and navigate to Home.
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: _emailCtl.text.trim(),
+        password: _passCtl.text,
+      );
+
+      final user = cred.user ?? _auth.currentUser;
+
+      if (user == null) {
+        // Unexpected: signed-in credential but no user object
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sign-in succeeded but no user found.')));
+        return;
+      }
+
+      // Success: navigate to Home (replace current route)
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeScreen(user: user)),
+      );
     } on FirebaseAuthException catch (e) {
-      var msg = e.message ?? 'Sign-in failed';
+      var msg = 'Sign-in failed';
       if (e.code == 'user-not-found') msg = 'No account found for that email.';
-      if (e.code == 'wrong-password') msg = 'Incorrect password.';
-      if (e.code == 'invalid-email') msg = 'Invalid email.';
-      if (e.code == 'too-many-requests') msg = 'Too many attempts. Try later.';
+      else if (e.code == 'wrong-password') msg = 'Incorrect password.';
+      else if (e.code == 'invalid-email') msg = 'Invalid email.';
+      else if (e.code == 'too-many-requests') msg = 'Too many attempts. Try later.';
+      else if (e.message != null) msg = e.message!;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
     } catch (e) {
+      // Generic fallback
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      // Optional: hide loading state
     }
   }
 

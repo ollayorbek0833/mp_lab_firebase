@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_button.dart';
+import 'messages_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final User user;
@@ -109,6 +110,16 @@ class _HomeScreenState extends State<HomeScreen> {
           TextField(controller: _photoCtl, decoration: const InputDecoration(labelText: 'Photo URL')),
           const SizedBox(height: 12),
           CustomButton(label: 'Save changes', onPressedAsync: _updateProfile),
+          const SizedBox(height: 12),
+          ElevatedButton(
+            child: const Text("Open Messages"),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const MessagesScreen()),
+              );
+            },
+          ),
           const SizedBox(height: 12),
           Row(children: [
             Expanded(child: CustomButton(label: 'Resend verification', onPressedAsync: _resendVerification)),
